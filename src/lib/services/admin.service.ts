@@ -1,67 +1,68 @@
 import type { AdminStats, User, Listing, Transaction } from "@/types";
-import { MOCK_USERS } from "@/lib/mock-data/users";
-import { MOCK_LISTINGS } from "@/lib/mock-data/listings";
-import { MOCK_TRANSACTIONS } from "@/lib/mock-data/transactions";
 
-const delay = (ms = 300) => new Promise((r) => setTimeout(r, ms));
+const BASE_URL =
+  typeof window === "undefined"
+    ? (process.env.NEXTAUTH_URL ??
+       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"))
+    : "";
 
 export async function getAdminStats(): Promise<AdminStats> {
-  await delay();
-  const totalUsers = MOCK_USERS.length;
-  const totalFarmers = MOCK_USERS.filter((u) => u.role === "farmer").length;
-  const totalBuyers = MOCK_USERS.filter((u) => u.role === "buyer").length;
-  const activeListings = MOCK_LISTINGS.filter((l) => l.status === "active").length;
-  const totalTransactions = MOCK_TRANSACTIONS.length;
-  const totalCommissionRevenue = MOCK_TRANSACTIONS.reduce((sum, t) => sum + t.commissionValue, 0);
-  const pendingVerifications = MOCK_USERS.filter((u) => !u.isVerified && u.role !== "admin").length;
-  const listingsThisMonth = MOCK_LISTINGS.filter((l) => {
-    const d = new Date(l.createdAt);
-    return d.getMonth() === 2 && d.getFullYear() === 2026; // March 2026
-  }).length;
-
-  return {
-    totalUsers,
-    totalFarmers,
-    totalBuyers,
-    activeListings,
-    totalTransactions,
-    totalCommissionRevenue,
-    pendingVerifications,
-    listingsThisMonth,
-  };
+  const res = await fetch(`${BASE_URL}/api/admin/stats`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch admin stats");
+  return res.json();
 }
 
 export async function getAdminUsers(): Promise<User[]> {
-  await delay();
-  return [...MOCK_USERS].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const res = await fetch(`${BASE_URL}/api/admin/users`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch admin users");
+  return res.json();
 }
 
 export async function getAdminListings(): Promise<Listing[]> {
-  await delay();
-  return [...MOCK_LISTINGS].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const res = await fetch(`${BASE_URL}/api/admin/listings`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch admin listings");
+  return res.json();
 }
 
 export async function getAdminTransactions(): Promise<Transaction[]> {
-  await delay();
-  return [...MOCK_TRANSACTIONS].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const res = await fetch(`${BASE_URL}/api/admin/transactions`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch admin transactions");
+  return res.json();
 }
 
 export async function verifyUser(userId: string): Promise<void> {
-  await delay(300);
-  // In real app: PATCH /api/admin/users/:id/verify
+  const res = await fetch(`${BASE_URL}/api/admin/users`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, action: "verify" }),
+  });
+  if (!res.ok) throw new Error("Failed to verify user");
 }
 
 export async function suspendUser(userId: string): Promise<void> {
-  await delay(300);
-  // In real app: PATCH /api/admin/users/:id/suspend
+  const res = await fetch(`${BASE_URL}/api/admin/users`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, action: "suspend" }),
+  });
+  if (!res.ok) throw new Error("Failed to suspend user");
 }
 
 export async function approveListing(listingId: string): Promise<void> {
-  await delay(300);
-  // In real app: PATCH /api/admin/listings/:id/approve
+  const res = await fetch(`${BASE_URL}/api/admin/listings`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ listingId, action: "approve" }),
+  });
+  if (!res.ok) throw new Error("Failed to approve listing");
 }
 
 export async function removeListing(listingId: string): Promise<void> {
-  await delay(300);
-  // In real app: DELETE /api/admin/listings/:id
+  const res = await fetch(`${BASE_URL}/api/admin/listings`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ listingId, action: "remove" }),
+  });
+  if (!res.ok) throw new Error("Failed to remove listing");
 }
+

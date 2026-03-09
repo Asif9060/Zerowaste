@@ -1,7 +1,10 @@
 import type { User } from "@/types";
-import { MOCK_USERS, DEMO_CREDENTIALS } from "@/lib/mock-data/users";
 
-const delay = (ms = 300) => new Promise((r) => setTimeout(r, ms));
+const BASE_URL =
+  typeof window === "undefined"
+    ? (process.env.NEXTAUTH_URL ??
+       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"))
+    : "";
 
 export interface LoginPayload {
   email: string;
@@ -18,53 +21,55 @@ export interface RegisterPayload {
   bio?: string;
 }
 
-export async function loginUser(payload: LoginPayload): Promise<User> {
-  await delay(500);
-  // Mock: any of the demo credentials or any email from mock users with password "demo1234"
-  const user = MOCK_USERS.find((u) => u.email === payload.email);
-  if (!user || payload.password !== "demo1234") {
-    throw new Error("Invalid email or password.");
-  }
-  if (user.isSuspended) {
-    throw new Error("Your account has been suspended. Contact support.");
-  }
-  return user;
+// loginUser is handled directly by next-auth signIn on the login page.
+// This stub is kept so existing imports don't break — pages call signIn() instead.
+export async function loginUser(_payload: LoginPayload): Promise<User> {
+  throw new Error("Use signIn('credentials', ...) from next-auth/react directly.");
 }
 
 export async function registerUser(payload: RegisterPayload): Promise<User> {
-  await delay(600);
-  // Mock: create user object (not persisted in mock)
-  const newUser: User = {
-    id: `u${Date.now()}`,
-    name: payload.name,
-    email: payload.email,
-    phone: payload.phone,
-    role: payload.role,
-    location: payload.location,
-    bio: payload.bio,
-    profilePhoto: `https://api.dicebear.com/9.x/avataaars/svg?seed=${payload.name}`,
-    isVerified: false,
-    isSuspended: false,
-    createdAt: new Date().toISOString(),
-  };
-  return newUser;
+  const res = await fetch(`${BASE_URL}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error ?? "Registration failed");
+  }
+  return res.json();
 }
 
 export async function getUserById(id: string): Promise<User | null> {
-  await delay();
-  return MOCK_USERS.find((u) => u.id === id) ?? null;
+  const res = await fetch(`${BASE_URL}/api/users/${id}`, { cache: "no-store" });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error("Failed to fetch user");
+  return res.json();
 }
 
 export async function getAllUsers(): Promise<User[]> {
-  await delay();
-  return [...MOCK_USERS];
+  const res = await fetch(`${BASE_URL}/api/admin/users`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch users");
+  return res.json();
 }
 
 export async function updateUser(id: string, data: Partial<User>): Promise<User> {
-  await delay(400);
-  const existing = MOCK_USERS.find((u) => u.id === id);
-  if (!existing) throw new Error("User not found");
-  return { ...existing, ...data };
+  const res = await fetch(`${BASE_URL}/api/users/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error ?? "Failed to update user");
+  }
+  return res.json();
 }
 
-export { DEMO_CREDENTIALS };
+// Demo credentials for quick-fill on login page
+export const DEMO_CREDENTIALS = {
+  farmer: { email: "sipho@farm.co.za", password: "demo1234" },
+  buyer: { email: "amahle@restaurant.co.za", password: "demo1234" },
+  admin: { email: "admin@zerowaste.farm", password: "demo1234" },
+};
+

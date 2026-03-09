@@ -21,9 +21,9 @@ export function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <Link href={`/marketplace/${listing.id}`} className="group block">
-      <Card className="overflow-hidden border-border transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 h-full">
+      <Card className="overflow-hidden border-border transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 h-full p-0 gap-0">
         {/* Image */}
-        <div className="relative h-44 bg-muted overflow-hidden">
+        <div className="relative h-44 bg-muted overflow-hidden rounded-t-xl flex-shrink-0">
           {listing.photos[0] ? (
             <Image
               src={listing.photos[0]}

@@ -63,9 +63,9 @@ export default async function HomePage() {
         <div className="pointer-events-none absolute -bottom-10 right-10 h-64 w-64 rounded-full bg-amber-200/40 blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <Badge className="mb-4 bg-primary/10 text-primary border-0 text-sm px-3 py-1">
+            {/* <Badge className="mb-4 bg-primary/10 text-primary border-0 text-sm px-3 py-1">
               🌱 South Africa &amp; Zimbabwe
-            </Badge>
+            </Badge> */}
             <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               Stop Food Waste.{" "}
               <span className="text-primary">Start Earning.</span>
@@ -193,7 +193,7 @@ export default async function HomePage() {
               </Button>
             </Link>
             <Link href="/auth/register">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white/10 px-10">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-primary hover:bg-white/10 px-10">
                 Register as Buyer
               </Button>
             </Link>

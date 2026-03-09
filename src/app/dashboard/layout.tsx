@@ -2,28 +2,31 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store/auth.store";
+import { useSession } from "next-auth/react";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated } = useAuthStore();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (status === "loading") return;
+    if (status === "unauthenticated") {
       router.replace("/auth/login");
-    } else if (user?.role === "admin") {
+      return;
+    }
+    if (session?.user?.role === "admin") {
       router.replace("/admin");
     }
-  }, [isAuthenticated, user, router]);
+  }, [status, session, router]);
 
-  if (!isAuthenticated || !user || user.role === "admin") {
-    return null;
-  }
+  if (status === "loading") return null;
+  if (status === "unauthenticated" || !session?.user) return null;
+  if (session.user.role === "admin") return null;
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
-      <DashboardSidebar role={user.role} />
+      <DashboardSidebar role={session.user.role as "farmer" | "buyer"} />
       <main className="flex-1 overflow-auto bg-background">
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">{children}</div>
       </main>

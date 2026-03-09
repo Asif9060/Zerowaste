@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { registerSchema, type RegisterFormData } from "@/lib/validators/auth.schema";
 import { registerUser } from "@/lib/services/users.service";
-import { useAuthStore } from "@/store/auth.store";
+import { signIn } from "next-auth/react";
 import { SA_LOCATIONS, ZW_LOCATIONS } from "@/lib/mock-data/locations";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,6 @@ type Step = 1 | 2;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const login = useAuthStore((s) => s.login);
   const [step, setStep] = useState<Step>(1);
   const [showPassword, setShowPassword] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<"ZA" | "ZW" | "">("");
@@ -76,7 +75,7 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const user = await registerUser({
+      await registerUser({
         name: data.name,
         email: data.email,
         phone: data.phone,
@@ -85,11 +84,24 @@ export default function RegisterPage() {
         location: data.location,
         bio: data.bio,
       });
-      login(user);
-      toast.success("Account created! Welcome to ZeroWaste Farm.");
-      router.push("/dashboard");
-    } catch {
-      toast.error("Registration failed. Please try again.");
+
+      // Sign in immediately after registration
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.ok) {
+        toast.success("Account created! Welcome to ZeroWaste Farm.");
+        router.push("/dashboard");
+        router.refresh();
+      } else {
+        toast.error("Account created but sign-in failed. Please log in.");
+        router.push("/auth/login");
+      }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Registration failed. Please try again.");
     }
   };
 

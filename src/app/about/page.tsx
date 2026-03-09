@@ -137,7 +137,7 @@ export default function AboutPage() {
               <Button variant="secondary" size="lg">Join as a Farmer</Button>
             </Link>
             <Link href="/marketplace">
-              <Button variant="outline" size="lg" className="border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10">
+              <Button variant="outline" size="lg" className="border-primary-foreground/50 text-primary hover:bg-primary-foreground/10">
                 Browse Listings
               </Button>
             </Link>

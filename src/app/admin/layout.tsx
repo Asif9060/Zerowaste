@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { LayoutDashboard, Users, Package, DollarSign, LogOut, ChevronRight } from "lucide-react";
-import { useAuthStore } from "@/store/auth.store";
+import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -18,23 +18,23 @@ const NAV = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (status === "loading") return;
+    if (status === "unauthenticated") {
       router.replace("/auth/login");
       return;
     }
-    if (user?.role !== "admin") {
+    if (session?.user?.role !== "admin") {
       router.replace("/dashboard");
     }
-  }, [isAuthenticated, user, router]);
+  }, [status, session, router]);
 
-  if (!isAuthenticated || user?.role !== "admin") return null;
+  if (status === "loading" || !session?.user || session.user.role !== "admin") return null;
 
   const handleLogout = () => {
-    logout();
-    router.push("/");
+    signOut({ callbackUrl: "/" });
   };
 
   return (
@@ -43,7 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="w-56 shrink-0 bg-background border-r border-border flex flex-col">
         <div className="px-5 py-5 border-b border-border">
           <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">Admin Panel</p>
-          <p className="font-bold text-foreground mt-0.5">{user.name}</p>
+          <p className="font-bold text-foreground mt-0.5">{session.user.name}</p>
         </div>
 
         <nav className="flex-1 py-4 px-3 space-y-0.5">

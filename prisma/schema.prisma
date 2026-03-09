@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  farmer
+  buyer
+  admin
+}
+
+enum ProduceCategory {
+  vegetables
+  fruits
+  grains
+  livestock
+  poultry
+  dairy
+  herbs
+  other
+}
+
+enum QuantityUnit {
+  kg
+  g
+  ton
+  crate
+  bag
+  dozen
+  head
+  litre
+}
+
+enum Urgency {
+  low
+  medium
+  high
+  critical
+}
+
+enum Currency {
+  ZAR
+  USD
+}
+
+enum ListingStatus {
+  active
+  sold
+  expired
+  pending_review
+  removed
+}
+
+enum TransactionStatus {
+  pending
+  contacted
+  completed
+  cancelled
+}
+
+enum NotificationType {
+  new_listing
+  listing_sold
+  listing_expiring
+  account_verified
+  new_contact
+  admin_action
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  phone        String
+  role         UserRole @default(buyer)
+  country      String
+  province     String
+  city         String
+  profilePhoto String?
+  bio          String?
+  isVerified   Boolean  @default(false)
+  isSuspended  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  listings           Listing[]      @relation("FarmerListings")
+  buyerTransactions  Transaction[]  @relation("BuyerTransactions")
+  farmerTransactions Transaction[]  @relation("FarmerTransactions")
+  notifications      Notification[]
+  favorites          Favorite[]
+
+  @@map("users")
+}
+
+model Listing {
+  id          String          @id @default(cuid())
+  farmerId    String
+  farmer      User            @relation("FarmerListings", fields: [farmerId], references: [id], onDelete: Cascade)
+  title       String
+  category    ProduceCategory
+  description String
+  quantity    Float
+  unit        QuantityUnit
+  price       Float
+  currency    Currency        @default(ZAR)
+  urgency     Urgency         @default(medium)
+  country     String
+  province    String
+  city        String
+  photos      String[]
+  status      ListingStatus   @default(pending_review)
+  views       Int             @default(0)
+  isFeatured  Boolean         @default(false)
+  expiresAt   DateTime
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  transactions Transaction[]
+  favorites    Favorite[]
+
+  @@map("listings")
+}
+
+model Transaction {
+  id              String            @id @default(cuid())
+  listingId       String
+  listing         Listing           @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingTitle    String
+  buyerId         String
+  buyer           User              @relation("BuyerTransactions", fields: [buyerId], references: [id], onDelete: Cascade)
+  buyerName       String
+  farmerId        String
+  farmer          User              @relation("FarmerTransactions", fields: [farmerId], references: [id], onDelete: Cascade)
+  farmerName      String
+  amount          Float
+  currency        Currency          @default(ZAR)
+  commissionRate  Float
+  commissionValue Float
+  status          TransactionStatus @default(pending)
+  createdAt       DateTime          @default(now())
+
+  @@map("transactions")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  href      String?
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@map("favorites")
+}
