@@ -58,30 +58,29 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-linear-to-br from-primary/5 to-amber-50/60 px-4 py-12">
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 font-bold text-primary text-2xl">
-            <Leaf className="h-8 w-8" />
+          <Link href="/" className="inline-flex items-center gap-2 font-bold text-primary text-xl">
+            <Leaf className="h-7 w-7" />
             ZeroWaste Farm
           </Link>
-          <p className="mt-2 text-base text-muted-foreground">Sign in to your account</p>
+          <p className="mt-2 text-muted-foreground">Sign in to your account</p>
         </div>
 
         <Card className="border-border shadow-sm">
-          <CardHeader className="pb-2 pt-8 px-8">
-            <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
+          <CardHeader className="pb-0">
+            <h1 className="text-xl font-bold text-foreground">Welcome back</h1>
           </CardHeader>
-          <CardContent className="pt-4 px-8 pb-8">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-sm font-medium">Email address</Label>
+          <CardContent className="pt-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-1">
+                <Label htmlFor="email">Email address</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="h-11 text-base"
                   {...register("email")}
                 />
                 {errors.email && (
@@ -89,8 +88,8 @@ export default function LoginPage() {
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+              <div className="space-y-1">
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -98,7 +97,7 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     autoComplete="current-password"
                     {...register("password")}
-                    className="pr-10 h-11 text-base"
+                    className="pr-10"
                   />
                   <button
                     type="button"
@@ -114,7 +113,7 @@ export default function LoginPage() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full h-11 text-base" disabled={isSubmitting}>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Signing in…" : "Sign in"}
               </Button>
             </form>

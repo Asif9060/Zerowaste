@@ -20,6 +20,7 @@ import {
 import { useAuthStore } from "@/store/auth.store";
 import { updateUser } from "@/lib/services/users.service";
 import { SA_LOCATIONS, ZW_LOCATIONS } from "@/lib/mock-data/locations";
+import { ImageUpload } from "@/components/shared/ImageUpload";
 import { toast } from "sonner";
 
 const profileSchema = z.object({
@@ -96,6 +97,23 @@ export default function ProfilePage() {
     }
   };
 
+  const handleProfilePhotoUpload = async (urls: string[]) => {
+    if (!user || !urls[0]) return;
+    try {
+      const res = await fetch(`/api/users/${user.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profilePhoto: urls[0] }),
+      });
+      if (!res.ok) throw new Error("Failed to update photo");
+      const updated = await res.json();
+      updateStoreUser(updated);
+      toast.success("Profile photo updated!");
+    } catch {
+      toast.error("Failed to update profile photo.");
+    }
+  };
+
   if (!user) return null;
 
   const initials = user.name
@@ -114,17 +132,26 @@ export default function ProfilePage() {
 
       {/* Avatar card */}
       <Card>
-        <CardContent className="pt-6 flex items-center gap-4">
-          <Avatar className="h-16 w-16">
+        <CardContent className="pt-6 flex items-start gap-5">
+          <Avatar className="h-16 w-16 shrink-0">
             <AvatarImage src={user.profilePhoto} alt={user.name} />
             <AvatarFallback className="bg-primary/10 text-primary text-lg font-semibold">
               {initials}
             </AvatarFallback>
           </Avatar>
-          <div>
+          <div className="flex-1 min-w-0">
             <p className="font-semibold text-foreground">{user.name}</p>
             <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{user.email}</p>
+            <div className="mt-4">
+              <ImageUpload
+                value={user.profilePhoto ? [user.profilePhoto] : []}
+                onChange={handleProfilePhotoUpload}
+                maxFiles={1}
+                folder="profiles"
+                label="Profile photo"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>

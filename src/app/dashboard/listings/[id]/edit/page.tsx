@@ -61,7 +61,7 @@ export default function EditListingPage() {
           city: listing.location.city,
         },
         expiresAt: listing.expiresAt.split("T")[0],
-        photoUrl: listing.photos[0] ?? "",
+        photos: listing.photos,
       }
     : undefined;
 

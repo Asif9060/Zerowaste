@@ -26,7 +26,7 @@ export const listingSchema = z.object({
   }),
   location: locationSchema,
   expiresAt: z.string().min(1, "Please select an expiry date"),
-  photoUrl: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  photos: z.array(z.string().url()).max(5).default([]),
 });
 
 export type ListingFormData = z.infer<typeof listingSchema>;

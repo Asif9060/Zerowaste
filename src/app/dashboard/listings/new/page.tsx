@@ -20,13 +20,11 @@ export default function NewListingPage() {
     if (!user) return;
     setIsSubmitting(true);
     try {
-      const { photoUrl, ...listingData } = data;
       await createListing({
-        ...listingData,
+        ...data,
         farmerId: user.id,
         farmerName: user.name,
         farmerPhone: user.phone,
-        photos: photoUrl ? [photoUrl] : [],
         status: "pending_review",
         isFeatured: false,
       });

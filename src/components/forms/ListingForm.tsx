@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { ImageUpload } from "@/components/shared/ImageUpload";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { listingSchema, type ListingFormData } from "@/lib/validators/listing.schema";
 import { PRODUCE_CATEGORIES } from "@/types";
@@ -44,6 +45,7 @@ export function ListingForm({ defaultValues, onSubmit, isSubmitting }: ListingFo
       currency: "ZAR",
       urgency: "medium",
       location: { country: "ZA", province: "", city: "" },
+      photos: [],
       ...defaultValues,
     },
   });
@@ -254,18 +256,16 @@ export function ListingForm({ defaultValues, onSubmit, isSubmitting }: ListingFo
         {errors.expiresAt && <p className="text-xs text-destructive">{errors.expiresAt.message}</p>}
       </div>
 
-      {/* Photo URL (mock) */}
+      {/* Photos */}
       <div className="space-y-1.5">
-        <Label htmlFor="photoUrl">Photo URL (optional)</Label>
-        <Input
-          id="photoUrl"
-          type="url"
-          placeholder="https://example.com/photo.jpg"
-          {...register("photoUrl")}
+        <ImageUpload
+          label="Photos (optional · up to 5)"
+          value={watch("photos") ?? []}
+          onChange={(urls) => setValue("photos", urls, { shouldValidate: true })}
+          maxFiles={5}
+          folder="listings"
         />
-        <p className="text-xs text-muted-foreground">
-          Paste a direct image URL. Photo upload coming soon.
-        </p>
+        {errors.photos && <p className="text-xs text-destructive">{errors.photos.message}</p>}
       </div>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
