@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ListingCard } from "@/components/marketplace/ListingCard";
+import { NearYouSection } from "@/components/marketplace/NearYouSection";
 import { getFeaturedListings } from "@/lib/services/listings.service";
 
 const HOW_IT_WORKS = [
@@ -156,6 +157,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Near You — client component, reads location from Zustand store */}
+      <NearYouSection />
 
       {/* Who Buys */}
       <section className="py-20 bg-gradient-to-br from-primary/5 to-amber-50/60">

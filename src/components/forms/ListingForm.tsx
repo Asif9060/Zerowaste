@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { listingSchema, type ListingFormData } from "@/lib/validators/listing.schema";
+import { listingSchema, type ListingFormData, type ListingFormInput } from "@/lib/validators/listing.schema";
 import { PRODUCE_CATEGORIES } from "@/types";
-import { SA_LOCATIONS, ZW_LOCATIONS } from "@/lib/mock-data/locations";
+import { SA_LOCATIONS, ZW_LOCATIONS, ALL_LOCATIONS } from "@/lib/mock-data/locations";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,7 @@ export function ListingForm({ defaultValues, onSubmit, isSubmitting }: ListingFo
     watch,
     setValue,
     formState: { errors },
-  } = useForm<ListingFormData>({
+  } = useForm<ListingFormInput, unknown, ListingFormData>({
     resolver: zodResolver(listingSchema),
     defaultValues: {
       title: "",
@@ -53,7 +53,7 @@ export function ListingForm({ defaultValues, onSubmit, isSubmitting }: ListingFo
   const selectedCountry = watch("location.country");
   const selectedProvince = watch("location.province");
 
-  const locationData = selectedCountry === "ZA" ? SA_LOCATIONS : ZW_LOCATIONS;
+  const locationData = ALL_LOCATIONS[selectedCountry] ?? SA_LOCATIONS;
   const provinces = Object.keys(locationData);
   const cities: string[] = selectedProvince ? (locationData[selectedProvince] ?? []) : [];
 

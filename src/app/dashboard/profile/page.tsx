@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useAuthStore } from "@/store/auth.store";
 import { updateUser } from "@/lib/services/users.service";
-import { SA_LOCATIONS, ZW_LOCATIONS } from "@/lib/mock-data/locations";
+import { SA_LOCATIONS, ZW_LOCATIONS, ALL_LOCATIONS } from "@/lib/mock-data/locations";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { toast } from "sonner";
 
@@ -51,7 +51,7 @@ export default function ProfilePage() {
       name: user?.name ?? "",
       phone: user?.phone ?? "",
       bio: user?.bio ?? "",
-      country: (user?.location.country as "ZA" | "ZW") ?? "ZA",
+      country: (user?.location.country ?? "ZA") as "ZA" | "ZW",
       province: user?.location.province ?? "",
       city: user?.location.city ?? "",
     },
@@ -60,7 +60,7 @@ export default function ProfilePage() {
   const selectedCountry = watch("country");
   const selectedProvince = watch("province");
 
-  const locationData = selectedCountry === "ZA" ? SA_LOCATIONS : ZW_LOCATIONS;
+  const locationData = ALL_LOCATIONS[selectedCountry] ?? {};
   const provinces = Object.keys(locationData);
   const cities: string[] = selectedProvince ? (locationData[selectedProvince] ?? []) : [];
 

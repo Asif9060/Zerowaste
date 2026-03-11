@@ -169,6 +169,7 @@ export interface ListingFilters {
   urgency?: Urgency | "all";
   country?: Country | "all";
   province?: string;
+  city?: string;
   priceMin?: number;
   priceMax?: number;
   currency?: Currency;

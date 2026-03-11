@@ -56,6 +56,9 @@ export async function GET(req: NextRequest) {
     const province = searchParams.get("province");
     if (province) where.province = province;
 
+    const city = searchParams.get("city");
+    if (city) where.city = city;
+
     const priceMin = searchParams.get("priceMin");
     const priceMax = searchParams.get("priceMax");
     if (priceMin || priceMax) {

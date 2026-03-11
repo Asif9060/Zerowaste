@@ -17,6 +17,7 @@ function buildQuery(filters?: ListingFilters): string {
   if (filters.urgency && filters.urgency !== "all") p.set("urgency", filters.urgency);
   if (filters.country && filters.country !== "all") p.set("country", filters.country);
   if (filters.province) p.set("province", filters.province);
+  if (filters.city) p.set("city", filters.city);
   if (filters.priceMin !== undefined) p.set("priceMin", String(filters.priceMin));
   if (filters.priceMax !== undefined) p.set("priceMax", String(filters.priceMax));
   if (filters.currency) p.set("currency", filters.currency);

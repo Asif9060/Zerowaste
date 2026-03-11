@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { registerSchema, type RegisterFormData } from "@/lib/validators/auth.schema";
 import { registerUser } from "@/lib/services/users.service";
 import { signIn } from "next-auth/react";
-import { SA_LOCATIONS, ZW_LOCATIONS } from "@/lib/mock-data/locations";
+import { SA_LOCATIONS, ZW_LOCATIONS, ALL_LOCATIONS } from "@/lib/mock-data/locations";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -63,14 +63,12 @@ export default function RegisterPage() {
     setValue("location.city", "");
   };
 
-  const provinces = selectedCountry === "ZA"
-    ? Object.keys(SA_LOCATIONS)
-    : selectedCountry === "ZW"
-    ? Object.keys(ZW_LOCATIONS)
+  const provinces = selectedCountry
+    ? Object.keys(ALL_LOCATIONS[selectedCountry] ?? {})
     : [];
 
   const cities = selectedCountry && selectedProvince
-    ? (selectedCountry === "ZA" ? SA_LOCATIONS : ZW_LOCATIONS)[selectedProvince] ?? []
+    ? (ALL_LOCATIONS[selectedCountry]?.[selectedProvince] ?? [])
     : [];
 
   const onSubmit = async (data: RegisterFormData) => {

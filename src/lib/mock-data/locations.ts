@@ -25,7 +25,7 @@ export const ZW_LOCATIONS: Record<string, string[]> = {
   "Midlands": ["Gweru", "Kwekwe", "Shurugwi"],
 };
 
-export const ALL_LOCATIONS = {
+export const ALL_LOCATIONS: Record<string, Record<string, string[]>> = {
   ZA: SA_LOCATIONS,
   ZW: ZW_LOCATIONS,
 };
